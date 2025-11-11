@@ -13,11 +13,13 @@ type Target struct {
 }
 
 type Config struct {
-	Targets []Target `mapstructure:"targets"`
+	Interval uint     `mapstructure:"interval"`
+	Targets  []Target `mapstructure:"targets"`
 }
 
 func LoadConfig(configPath string) (*Config, error) {
 	viper.SetConfigFile(configPath)
+	viper.SetDefault("interval", 10)
 	viper.SetDefault("targets", []Target{})
 
 	if err := viper.ReadInConfig(); err != nil {

@@ -18,6 +18,24 @@ type application struct {
 }
 
 func (app *application) Run(ctx context.Context) error {
+	ticker := time.NewTicker(time.Duration(app.config.Interval) * time.Second)
+	defer ticker.Stop()
+
+	app.fetchReportsFromTargets()
+
+	for {
+		select {
+		case <-ctx.Done():
+			log.Println("Shutting down collector...")
+			return nil
+		case <-ticker.C:
+			log.Println("Collecting reports from targets...")
+			app.fetchReportsFromTargets()
+		}
+	}
+}
+
+func (app *application) fetchReportsFromTargets() {
 	for _, target := range app.config.Targets {
 		systemReport, err := fetchReport(fmt.Sprintf("%s:%d", target.Host, target.Port))
 		if err != nil {
@@ -27,8 +45,6 @@ func (app *application) Run(ctx context.Context) error {
 
 		log.Printf("Report from target %s:\n%+v\n", target.Name, systemReport)
 	}
-
-	return nil
 }
 
 func fetchReport(host string) (*systemreport.SystemReport, error) {

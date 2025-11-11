@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
-	"shazxrin.github.io/ruoke/internal/systemreport"
 	"time"
+
+	"shazxrin.github.io/ruoke/internal/systemreport"
 )
 
 func fetchReport(host string) (*systemreport.SystemReport, error) {
@@ -31,11 +33,19 @@ func fetchReport(host string) (*systemreport.SystemReport, error) {
 }
 
 func main() {
-	systemReport, err := fetchReport("localhost:8080")
+	config, err := LoadConfig("config.yaml")
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalln("Error loading config:", err)
 		return
 	}
 
-	fmt.Println(systemReport)
+	for _, target := range config.Targets {
+		systemReport, err := fetchReport(fmt.Sprintf("%s:%d", target.Host, target.Port))
+		if err != nil {
+			log.Printf("Error fetching report from target %s: %v\n", target.Name, err)
+			continue
+		}
+		
+		fmt.Printf("Report from target %s:\n%+v\n", target.Name, systemReport)
+	}
 }

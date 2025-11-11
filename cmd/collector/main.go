@@ -33,7 +33,9 @@ func fetchReport(host string) (*systemreport.SystemReport, error) {
 }
 
 func main() {
-	config, err := LoadConfig("config.yaml")
+	flags := ParseFlags()
+
+	config, err := LoadConfig(flags.ConfigPath)
 	if err != nil {
 		log.Fatalln("Error loading config:", err)
 		return

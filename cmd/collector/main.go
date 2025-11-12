@@ -17,9 +17,13 @@ func main() {
 		return
 	}
 
+	notifier := NewPushoverNotifier(config.PushoverAppToken, config.PushoverUserToken)
+
 	app := &application{
 		flags:  flags,
 		config: config,
+
+		notifier: notifier,
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())

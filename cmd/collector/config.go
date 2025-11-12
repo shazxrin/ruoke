@@ -15,6 +15,9 @@ type Target struct {
 type Config struct {
 	Interval uint     `mapstructure:"interval"`
 	Targets  []Target `mapstructure:"targets"`
+
+	PushoverAppToken  string `mapstructure:"pushoverAppToken"`
+	PushoverUserToken string `mapstructure:"pushoverUserToken"`
 }
 
 func LoadConfig(configPath string) (*Config, error) {

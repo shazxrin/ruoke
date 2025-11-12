@@ -12,9 +12,19 @@ import (
 	"shazxrin.github.io/ruoke/internal/systemreport"
 )
 
+const (
+	day  = 24
+	hour = 60
+	kb   = 1024
+	mb   = 1024 * kb
+	gb   = 1024 * mb
+)
+
 type application struct {
 	flags  *Flags
 	config *Config
+
+	notifier Notifier
 }
 
 func (app *application) Run(ctx context.Context) error {
@@ -36,15 +46,30 @@ func (app *application) Run(ctx context.Context) error {
 }
 
 func (app *application) fetchReportsFromTargets() {
+	var msg string
 	for _, target := range app.config.Targets {
 		systemReport, err := fetchReport(fmt.Sprintf("%s:%d", target.Host, target.Port))
 		if err != nil {
 			log.Printf("Error fetching report from target %s: %v\n", target.Name, err)
+			msg = msg + fmt.Sprintf("%s\nStatus: Down\n\n", target.Name)
 			continue
 		}
 
-		log.Printf("Report from target %s:\n%+v\n", target.Name, systemReport)
+		uptimeDuration := time.Duration(systemReport.Uptime) * time.Second
+
+		msg = msg + fmt.Sprintf(
+			"%s\nStatus: Up\nUptime: %d d %d h %d m\nLoad: %.2f (1m) %.2f (5m) %.2f (15m)\nMemory: %.2f GB (U) %.2f GB (F) %.2f GB (T)\n\n",
+			target.Name,
+			int(uptimeDuration.Hours())/day, int(uptimeDuration.Hours())%day, int(uptimeDuration.Minutes())%hour,
+			systemReport.Load1,
+			systemReport.Load5,
+			systemReport.Load15,
+			float64(systemReport.UsedMemory)/gb,
+			float64(systemReport.FreeMemory)/gb,
+			float64(systemReport.TotalMemory)/gb,
+		)
 	}
+	app.notifier.Notify("Status Report", msg)
 }
 
 func fetchReport(host string) (*systemreport.SystemReport, error) {

@@ -1,4 +1,7 @@
 interval: 1
+pushover:
+  userToken: ""
+  appToken: ""
 targets:
   - name: "localhost"
     host: "localhost"

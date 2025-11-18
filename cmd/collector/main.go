@@ -17,7 +17,7 @@ func main() {
 		return
 	}
 
-	notifier := NewPushoverNotifier(config.PushoverAppToken, config.PushoverUserToken)
+	notifier := NewPushoverNotifier(config.Pushover.AppToken, config.Pushover.UserToken)
 
 	app := &application{
 		flags:  flags,

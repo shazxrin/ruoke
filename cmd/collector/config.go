@@ -6,24 +6,28 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Target struct {
+type TargetConfig struct {
 	Name string `mapstructure:"name"`
 	Host string `mapstructure:"host"`
 	Port int    `mapstructure:"port"`
 }
 
-type Config struct {
-	Interval uint     `mapstructure:"interval"`
-	Targets  []Target `mapstructure:"targets"`
+type PushoverConfig struct {
+	AppToken  string `mapstructure:"appToken"`
+	UserToken string `mapstructure:"userToken"`
+}
 
-	PushoverAppToken  string `mapstructure:"pushoverAppToken"`
-	PushoverUserToken string `mapstructure:"pushoverUserToken"`
+type Config struct {
+	Interval uint           `mapstructure:"interval"`
+	Targets  []TargetConfig `mapstructure:"targets"`
+
+	Pushover PushoverConfig `mapstructure:"pushover"`
 }
 
 func LoadConfig(configPath string) (*Config, error) {
 	viper.SetConfigFile(configPath)
 	viper.SetDefault("interval", 10)
-	viper.SetDefault("targets", []Target{})
+	viper.SetDefault("targets", []TargetConfig{})
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)

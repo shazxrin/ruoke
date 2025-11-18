@@ -3,14 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/shirou/gopsutil/v4/host"
-	"github.com/shirou/gopsutil/v4/load"
-	"github.com/shirou/gopsutil/v4/mem"
 	"log"
 	"net/http"
 	"os"
-	"shazxrin.github.io/ruoke/internal/systemreport"
 	"time"
+
+	"github.com/shirou/gopsutil/v4/host"
+	"github.com/shirou/gopsutil/v4/load"
+	"github.com/shirou/gopsutil/v4/mem"
+	"shazxrin.github.io/ruoke/internal/systemreport"
 )
 
 func createSystemReport() (*systemreport.SystemReport, error) {

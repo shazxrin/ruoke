@@ -69,7 +69,11 @@ func (app *application) fetchReportsFromTargets() {
 			float64(systemReport.TotalMemory)/gb,
 		)
 	}
-	app.notifier.Notify("Status Report", msg)
+
+	err := app.notifier.Notify("Status Report", msg)
+	if err != nil {
+		return
+	}
 }
 
 func fetchReport(host string) (*systemreport.SystemReport, error) {

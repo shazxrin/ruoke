@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"time"
@@ -85,8 +84,7 @@ func fetchReport(host string) (*systemreport.SystemReport, error) {
 
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("monitor returned non-OK status for %s: %d, body: %s", host, resp.StatusCode, string(bodyBytes))
+		return nil, fmt.Errorf("monitor returned non-OK status for %s: %d", host, resp.StatusCode)
 	}
 
 	var report systemreport.SystemReport

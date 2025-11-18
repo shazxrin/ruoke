@@ -83,16 +83,10 @@ func fetchReport(host string) (*systemreport.SystemReport, error) {
 		return nil, fmt.Errorf("failed to fetch report from %s: %w", host, err)
 	}
 
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		bodyDecoder := json.NewDecoder(resp.Body)
-
-		var body systemreport.SystemReport
-		err := bodyDecoder.Decode(&body)
-		if err != nil && err != io.EOF {
-			return nil, fmt.Errorf("failed to decode JSON error response from %s: %w", host, err)
-		}
-
-		return &body, nil
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("monitor returned non-OK status for %s: %d, body: %s", host, resp.StatusCode, string(bodyBytes))
 	}
 
 	var report systemreport.SystemReport
